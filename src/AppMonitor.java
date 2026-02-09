@@ -6,13 +6,13 @@ import java.util.List;
 
 public class AppMonitor {
    private ArrayList<String> blackList;
-   private boolean hardMode;
+   private boolean deepWorkMode;
    ArrayList<String> ignoreTitles = new ArrayList<>();
 
 
-    public AppMonitor(ArrayList<String> list, boolean mode){
+    public AppMonitor(ArrayList<String> list, boolean deepWork){
         this.blackList = list;
-        this.hardMode = mode;
+        this.deepWorkMode = deepWork;
 
         ignoreTitles.add("N/A");
         ignoreTitles.add("OleMainThreadWndName");   
@@ -27,7 +27,7 @@ public class AppMonitor {
 
     /*Method that uses the command prompt to get a list of the running applications, ensures it is not a background process ,
     and then comapres it to the black listed apps */ 
-    public void isAppRunningTest(List<String> blackList){
+    public boolean isAppRunning(List<String> blackList){
         String line;
         try{
             Process p = Runtime.getRuntime().exec("tasklist /v /fo csv /nh");
@@ -37,8 +37,33 @@ public class AppMonitor {
             while ((line = input.readLine()) != null) {
                 for (int i = 0; i < blackList.size(); i++){
                     if (line.contains(blackList.get(i)) && isRealWindow(line)){
+                        System.out.println("Detected " + getFileName(line)  );
+                        if (deepWorkMode){
+                            closeApp(line);
+                        }
+                        return false;
+                    }
+                }
+            }
+            input.close();
+        }
+        catch(Exception e){
+            System.out.println("Error Message");
+        }
+        return true;
+    }
+    
+    public void isAppRunningTest(List<String> blackList){
+        String line;
+        try{
+            Process p = Runtime.getRuntime().exec("tasklist /v /fo csv /nh");
+            BufferedReader input = new BufferedReader(new InputStreamReader(p.getInputStream()));
+
+            while ((line = input.readLine()) != null) {
+                for (int i = 0; i < blackList.size(); i++){
+                    if (line.contains(blackList.get(i)) && isRealWindow(line)){
                         System.out.println("Detected " + line);
-                        if (hardMode){
+                        if (deepWorkMode){
                             closeApp(line);
                         }
                     }
@@ -58,8 +83,12 @@ public class AppMonitor {
         }
         return true;
     }
+    public String getFileName(String CSVLine){
+        String fileName = CSVLine.split("\",\"")[0].replaceAll("\"", "");
+        return fileName;
+    }
     public void closeApp(String CSVLine){
-        String appName = CSVLine.split("\",\"")[0].replaceAll("\"", "");
+        String appName = getFileName(CSVLine);
         try{
             Runtime.getRuntime().exec("taskkill /F /IM " + appName);
             System.out.println("Closed " + appName);
