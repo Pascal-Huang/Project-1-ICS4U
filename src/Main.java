@@ -3,16 +3,19 @@ import java.util.List;
 
 public class Main{
     public static void main(String[] args) throws Exception {
-        ArrayList<String> blackList = new ArrayList<>(List.of("Discord.exe", "chrome.exe", "steam.exe", "Spotify.exe", "Notepad.exe"));
-        AppMonitor monitor = new AppMonitor(blackList);
+        ArrayList<String> blackList = new ArrayList<>(List.of("Discord.exe", "steam.exe", "Spotify.exe", "Notepad.exe", "ONENOTE.EXE"));
+        AppMonitor monitor = new AppMonitor(blackList, true);
+        pet pet = new pet(100, 0, 0, true);
 
-        monitor.isAppRunningTest(blackList);
+        closeBlackList(monitor, blackList);
+        // monitor.isAppRunningTest(blackList);
+    }
 
-        // for (int i = 0; i < appList.length; i ++){
-        //     if (monitor.isAppRunning(appList[i])){
-        //         System.out.println("Detected: " + appList[i]);
-        //     }
-        // }
+    // Used to prepare the app monitor, to ensure no false detections with background processes occurs
+    public static void closeBlackList(AppMonitor monitor, List<String> blackList){
+        for (String app : blackList){
+            monitor.closeApp(app);
+        }
     }
 }
 

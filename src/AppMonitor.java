@@ -6,11 +6,13 @@ import java.util.List;
 
 public class AppMonitor {
    private ArrayList<String> blackList;
+   private boolean hardMode;
    ArrayList<String> ignoreTitles = new ArrayList<>();
 
 
-    public AppMonitor(ArrayList<String> list){
+    public AppMonitor(ArrayList<String> list, boolean mode){
         this.blackList = list;
+        this.hardMode = mode;
 
         ignoreTitles.add("N/A");
         ignoreTitles.add("OleMainThreadWndName");   
@@ -23,6 +25,8 @@ public class AppMonitor {
         blackList.add(app);
     }
 
+    /*Method that uses the command prompt to get a list of the running applications, ensures it is not a background process ,
+    and then comapres it to the black listed apps */ 
     public void isAppRunningTest(List<String> blackList){
         String line;
         try{
@@ -32,9 +36,10 @@ public class AppMonitor {
 
             while ((line = input.readLine()) != null) {
                 for (int i = 0; i < blackList.size(); i++){
-                    if (line.contains(blackList.get(i))){
-                        if (isRealWindow(line)){
-                            System.out.println(line);
+                    if (line.contains(blackList.get(i)) && isRealWindow(line)){
+                        System.out.println("Detected " + line);
+                        if (hardMode){
+                            closeApp(line);
                         }
                     }
                 }
@@ -52,7 +57,16 @@ public class AppMonitor {
             }
         }
         return true;
-
+    }
+    public void closeApp(String CSVLine){
+        String appName = CSVLine.split("\",\"")[0].replaceAll("\"", "");
+        try{
+            Runtime.getRuntime().exec("taskkill /F /IM " + appName);
+            System.out.println("Closed " + appName);
+        }
+        catch(Exception e){
+            System.out.println("Error closing app: " + e.getMessage());
+        }
     }
 }
 
