@@ -3,6 +3,8 @@ public class Pet {
     private long xp;
     private int level;
     private boolean isAlive;
+    private long xpIncrease = 50;
+    private long requirementIncrease = 0;
 
     public Pet(int h, int x, int lvl, boolean isA){
         this.health = h;
@@ -19,9 +21,9 @@ public class Pet {
     }
     public long getRequiredXp(int lvl) {
         long base = 100;
-        long increase = 50;
+        xpIncrease = 50;
 
-        return base + ((long)(lvl - 1) * increase);
+        return base + ((long)(lvl - 1) * (xpIncrease + requirementIncrease));
     }
     public int getLevel() {
         return level;
@@ -66,8 +68,24 @@ public class Pet {
         this.level -= 1;
         System.out.println("Your pet has leveled down to level " + this.level);
     }
+
+    public void setHealth(int health) {
+        this.health = health;
+    }
+    public void setXp(long xp) {
+        this.xp = xp;
+    }
+    public void setLevel(int level) {
+        this.level = level;
+    }
     public void setAlive(boolean alive) {
         isAlive = alive;
+    }
+    public void setXpIncrease(int xp){
+        xpIncrease = xp;
+    }
+    public void setRequirementIncrease(int xp){
+        requirementIncrease = xp;
     }
 
     @Override
