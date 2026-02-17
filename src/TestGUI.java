@@ -171,7 +171,7 @@ public class TestGUI extends JFrame {
         setupListeners();
 
         // 4. Start the Game Loop
-        dataManager.loadPetData();
+        dataManager.loadData();
         monitor.closeBlackList(monitor.getBlackList());
         System.out.println(pet.toString());
         loadAnimations();
@@ -270,43 +270,66 @@ public class TestGUI extends JFrame {
         });
         
         settingsButton.addActionListener(e -> {
-            new SettingsGUI(monitor, dataManager);
-            isPlaying = false; // Pause the game when settings is open
+            SettingsGUI settingsScreen = new SettingsGUI(monitor, dataManager);
+            settingsScreen.addWindowListener(new java.awt.event.WindowAdapter(){
+                @Override
+                public void windowClosed(java.awt.event.WindowEvent windowEvent) {
+                    togglePause();
+                }
+            });
+            if (isPlaying) {
+                togglePause(); // Pause the game when settings is opened
+            }
+            settingsScreen.setVisible(true);
         });
     }
 
     public void startProgram() {
-        // Runs every 40 seconds
-        Timer timer = new Timer(40000, e -> {
-            if (!isPlaying) return; // Skip if paused
+        Thread gameLoop = new Thread(() -> {
+            while(true){
+                if (isPlaying){
+                    SwingUtilities.invokeLater(() -> statusLabel.setText("Status: Scanning...")); // Update Status to "Scanning"
 
-            Thread backgroundScanner = new Thread(() -> {
-                // Update Status to "Scanning"
-                SwingUtilities.invokeLater(() -> statusLabel.setText("Status: Scanning..."));
+                    boolean isFocused = monitor.isFocused(monitor.getBlackList()); 
+                    if (isFocused) {
+                        pet.changeXp(1000);
+                    } else {
+                        pet.changeHealth(-5);
+                        pet.changeXp(-200);
+                    }
+                    dataManager.saveData();
+                    System.out.println(pet.toString());
 
-                boolean isSafe = monitor.isFocused(monitor.getBlackList()); 
-
-                if (isSafe) {
-                    pet.changeXp(1000);
-                } else {
-                    pet.changeHealth(-5);
-                    pet.changeXp(-200);
+                    // Update UI on main thread
+                    SwingUtilities.invokeLater(() -> {
+                        healthBar.setValue(pet.getHealth());
+                        xpBar.setValue((int)pet.getXp());
+                        xpBar.setString("XP: " + pet.getXp());
+                        
+                        if (isFocused) statusLabel.setText("Status: Focused");
+                        else statusLabel.setText("Status: Distracted!");
+                    });
                 }
-                dataManager.savePetData();
-
-                // Update UI on main thread
-                SwingUtilities.invokeLater(() -> {
-                    healthBar.setValue(pet.getHealth());
-                    xpBar.setValue((int)pet.getXp());
-                    xpBar.setString("XP: " + pet.getXp());
-                    
-                    if (isSafe) statusLabel.setText("Status: Studying");
-                    else statusLabel.setText("Status: Distracted!");
-                });
-            });
-            backgroundScanner.start();
+                else{
+                    try { 
+                    Thread.sleep(1000); //Gives CPU a rest
+                    } catch (InterruptedException e) { 
+                        e.printStackTrace(); 
+                    }
+                }
+            }
         });
-        timer.setInitialDelay(0);
-        timer.start();
+        gameLoop.start();
+    }
+    public void togglePause(){
+        isPlaying = !isPlaying;
+        if (isPlaying) {
+            pauseButton.setIcon(pauseButtonToggle[0]); // Show pause icon when playing
+            statusLabel.setText("Game Resumed");
+        } 
+        else {
+            pauseButton.setIcon(pauseButtonToggle[1]); // Show play icon when paused
+            statusLabel.setText("Game Paused");
+        }
     }
 }

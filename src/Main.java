@@ -9,11 +9,11 @@ public class Main{
         int profileNumber = scanner.nextInt();
         scanner.close();
 
-        ArrayList<String> blackList = new ArrayList<>(List.of("discord.exe", "steam.exe", "spotify.exe", "notepad.exe", "onenote.exe", "valorant.exe"));
-        ArrayList<String> blackListedSites = new ArrayList<>(List.of("youtube", "gemini"));
+        ArrayList<String> blackList = new ArrayList<>(List.of("discord", "steam", "instagram", "valorant", "minecraft", "gemini"));
+        // ArrayList<String> blackListedSites = new ArrayList<>(List.of("youtube", "gemini"));
 
         Pet pet = new Pet(100, 0, 0, true);
-        AppMonitor monitor = new AppMonitor(blackList, blackListedSites, false);
+        AppMonitor monitor = new AppMonitor(blackList, false);
         DataManager dataManager = new DataManager(pet, profileNumber, monitor);
         new TestGUI(pet, monitor, dataManager);
 

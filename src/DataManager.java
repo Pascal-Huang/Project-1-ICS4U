@@ -1,4 +1,6 @@
 import java.io.*;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 public class DataManager {
     private final String profile1 = "profile1.txt";
@@ -24,39 +26,41 @@ public class DataManager {
         }
     }
     
-    public void savePetData(){
+    public void saveData(){
         try {
             PrintWriter writer = new PrintWriter(new FileWriter(filePath));
-            writer.println(pet.getHealth() + "," + pet.getXp() + "," + pet.getLevel() + "," + pet.isAlive());
+            writer.println(pet.getHealth() + "," + pet.getXp() + "," + pet.getLevel() + "," + pet.isAlive()); //Line 1 (pet data)
+            writer.println(String.join(",", monitor.getBlackList())); //Line 2 (blacklisted apps)
+
             writer.close();
         }
         catch(IOException e){
             System.out.println("Error saving data " + e.getMessage());
-            System.out.println("Hello");
         }
     }   
-    public void loadPetData(){
+    public void loadData(){
         try{
             BufferedReader reader = new BufferedReader(new FileReader(filePath));
-            String line = reader.readLine();
+            String line1 = reader.readLine();
 
-            String[] data = line.split(",");
+            String[] data = line1.split(",");
             pet.setHealth(Integer.parseInt(data[0]));
             pet.setXp(Long.parseLong(data[1]));
             pet.setLevel(Integer.parseInt(data[2]));
             pet.setAlive(Boolean.parseBoolean(data[3]));
 
-            System.out.println("Data loaded successfully.");
+            String line2 = reader.readLine();
+            if (line2 != null && !line2.isEmpty()) {
+                String[] blackListData = line2.split(",");
+                monitor.getBlackList().clear(); // Clear existing list before loading
+                monitor.getBlackList().addAll(Arrays.asList(blackListData));
+            }
 
+            System.out.println("Data loaded successfully.");
             reader.close();
         }
         catch(IOException e){
             System.out.println("Error loading data " + e.getMessage());
         }
-    }
-
-    public void saveBlackList() {
-    }
-    public void loadBlackList(){
     }
 }

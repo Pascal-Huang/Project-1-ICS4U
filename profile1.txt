@@ -1,1 +1,2 @@
-55,19499,2000,true
+19955,24299,2000,true
+discord,spotify,youtube,steam

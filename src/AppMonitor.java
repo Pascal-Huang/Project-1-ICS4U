@@ -6,14 +6,12 @@ import java.util.List;
 
 public class AppMonitor {
    private ArrayList<String> blackList;
-   private ArrayList<String> blacklistedSites;
    private boolean deepWorkMode;
    ArrayList<String> ignoreTitles = new ArrayList<>();
 
 
-    public AppMonitor(ArrayList<String> list, ArrayList<String> siteList,boolean deepWork){
+    public AppMonitor(ArrayList<String> list,boolean deepWork){
         this.blackList = list;
-        this.blacklistedSites = siteList;
         this.deepWorkMode = deepWork;
 
         ignoreTitles.add("n/a");
@@ -35,7 +33,7 @@ public class AppMonitor {
             while ((line = input.readLine()) != null) {
                 String lowerLine = line.toLowerCase();
                 for (int i = 0; i < blackList.size(); i++){
-                    if ((lowerLine.contains(blackList.get(i)) && isRealWindow(lowerLine)) || checkSites(lowerLine)){
+                    if ((lowerLine.contains(blackList.get(i)) && isRealWindow(lowerLine))){
                         System.out.println("Detected " + lowerLine);
                         if (deepWorkMode){
                             closeApp(lowerLine);
@@ -59,14 +57,6 @@ public class AppMonitor {
         }
         return true;
     }
-    public boolean checkSites(String app){
-        for (int i = 0; i < blacklistedSites.size(); i++){
-            if (app.contains(blacklistedSites.get(i))){
-                return true;
-            }
-        }
-        return false;
-    }
     public String getFileName(String CSVLine){
         String fileName = CSVLine.split("\",\"")[0].replaceAll("\"", "");
         return fileName;
@@ -78,13 +68,10 @@ public class AppMonitor {
     public ArrayList<String> getBlackList() {
         return blackList;
     }
-    public ArrayList<String> getBlacklistedSites() {
-        return blacklistedSites;
-    }   
     public void closeApp(String CSVLine){
         String appName = getFileName(CSVLine);
         try{
-            Runtime.getRuntime().exec("taskkill /F /IM " + appName);
+            Runtime.getRuntime().exec("taskkill /F /IM " + appName + ".exe");
             System.out.println("Closed " + appName);
         }
         catch(Exception e){
@@ -95,12 +82,6 @@ public class AppMonitor {
         String program = app.toLowerCase();
         if (!blackList.contains(program)){
             blackList.add(program);
-        }
-    }
-    public void addToBlackListSites(String app){
-        String program = app.toLowerCase();
-        if (!blacklistedSites.contains(program)){
-            blacklistedSites.add(program);
         }
     }
     // Used to prepare the app monitor, to ensure no false detections with background processes occurs
