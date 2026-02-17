@@ -22,10 +22,6 @@ public class AppMonitor {
         ignoreTitles.add("notification");
         ignoreTitles.add("updater");
     }
-    
-    public void addToBlackList(String app){
-        blackList.add(app);
-    }
 
     /*Method that uses the command prompt to get a list of the running applications, ensures it is not a background process ,
     and then comapres it to the black listed apps */ 
@@ -55,29 +51,6 @@ public class AppMonitor {
         }
         return true;
     }
-    
-    // public void isAppRunningTest(List<String> blackList){
-    //     String line;
-    //     try{
-    //         Process p = Runtime.getRuntime().exec("tasklist /v /fo csv /nh");
-    //         BufferedReader input = new BufferedReader(new InputStreamReader(p.getInputStream()));
-
-    //         while ((line = input.readLine()) != null) {
-    //             for (int i = 0; i < blackList.size(); i++){
-    //                 if (line.contains(blackList.get(i)) && isRealWindow(line)){
-    //                     System.out.println("Detected " + line);
-    //                     if (deepWorkMode){
-    //                         closeApp(line);
-    //                     }
-    //                 }
-    //             }
-    //         }
-    //         input.close();
-    //     }
-    //     catch(Exception e){
-    //         System.out.println("Error Message");
-    //     }
-    // }
     public boolean isRealWindow(String app){
         for (int i = 0; i < ignoreTitles.size(); i++){
             if (app.contains(ignoreTitles.get(i))){
@@ -118,6 +91,19 @@ public class AppMonitor {
             System.out.println("Error closing app: " + e.getMessage());
         }
     }
+    public void addToBlackList(String app){
+        String program = app.toLowerCase();
+        if (!blackList.contains(program)){
+            blackList.add(program);
+        }
+    }
+    public void addToBlackListSites(String app){
+        String program = app.toLowerCase();
+        if (!blacklistedSites.contains(program)){
+            blacklistedSites.add(program);
+        }
+    }
+    // Used to prepare the app monitor, to ensure no false detections with background processes occurs
     public void closeBlackList(List<String> blackList){
         for (String app : blackList){
             closeApp(app);

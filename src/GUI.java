@@ -21,7 +21,7 @@ public class GUI extends JFrame implements ActionListener{
         this.monitor = m;
         this.dataManager = d;
 
-        setSize(800,600);
+        setSize(600,600);
         setTitle("Virtual Pet Game");
         setLayout(new BorderLayout());
         setLocationRelativeTo(null);

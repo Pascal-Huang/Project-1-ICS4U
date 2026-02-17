@@ -6,10 +6,13 @@ public class DataManager {
     private final String filePath;
     private int profileNumber;
     private Pet pet;
+    private AppMonitor monitor;
 
-    public DataManager(Pet pet, int profile){
+    public DataManager(Pet pet, int profile, AppMonitor monitor){
         this.pet = pet;
         this.profileNumber = profile;
+        this.monitor = monitor;
+
         if (profile == 1){
             filePath = profile1;
         }
@@ -50,5 +53,10 @@ public class DataManager {
         catch(IOException e){
             System.out.println("Error loading data " + e.getMessage());
         }
+    }
+
+    public void saveBlackList() {
+    }
+    public void loadBlackList(){
     }
 }
