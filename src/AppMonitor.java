@@ -68,6 +68,12 @@ public class AppMonitor {
     public ArrayList<String> getBlackList() {
         return blackList;
     }
+    public boolean getDeepWork(){
+        return deepWorkMode;
+    }   
+    public void setDeepWork(boolean mode){
+        this.deepWorkMode = mode;
+    }
     public void closeApp(String CSVLine){
         String appName = getFileName(CSVLine);
         try{

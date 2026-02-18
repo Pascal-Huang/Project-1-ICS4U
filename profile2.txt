@@ -1,1 +1,2 @@
-100,150,11,true
+100,399,19,true
+discord,steam,instagram,valorant,minecraft,gemini,spotify,notepad
