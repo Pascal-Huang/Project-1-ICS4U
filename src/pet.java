@@ -1,4 +1,5 @@
 public class Pet {
+    private String name;
     private int health;
     private long xp;
     private int level;
@@ -7,6 +8,7 @@ public class Pet {
     private long requirementIncrease = 0;
 
     public Pet(int h, int x, int lvl, boolean isA){
+        this.name = "Pet";
         this.health = h;
         this.xp = x;
         this.level = lvl;
@@ -86,6 +88,12 @@ public class Pet {
     }
     public void setRequirementIncrease(int xp){
         requirementIncrease = xp;
+    }
+    public String getName(){
+        return name;
+    }
+    public void setName(String name){
+        this.name = name;
     }
 
     @Override

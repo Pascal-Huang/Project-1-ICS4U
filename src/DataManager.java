@@ -5,25 +5,15 @@ import java.util.Arrays;
 public class DataManager {
     private final String profile1 = "profile1.txt";
     private final String profile2 = "profile2.txt";
-    private final String filePath;
+    private String filePath;
     private int profileNumber;
     private Pet pet;
     private AppMonitor monitor;
 
-    public DataManager(Pet pet, int profile, AppMonitor monitor){
+    public DataManager(Pet pet, AppMonitor monitor){
         this.pet = pet;
-        this.profileNumber = profile;
         this.monitor = monitor;
 
-        if (profile == 1){
-            filePath = profile1;
-        }
-        else if (profile == 2){
-            filePath = profile2;
-        }
-        else{
-            throw new IllegalArgumentException("Invalid profile number. Must be 1 or 2.");
-        }
     }
     
     public void saveData(){
@@ -61,6 +51,14 @@ public class DataManager {
         }
         catch(IOException e){
             System.out.println("Error loading data " + e.getMessage());
+        }
+    }
+    public void setFilePath(int profile){
+        if (profile == 1){
+            this.filePath = profile1;
+        }
+        else if (profile == 2){
+            this.filePath = profile2;
         }
     }
 }

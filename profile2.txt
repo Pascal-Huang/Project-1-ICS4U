@@ -1,2 +1,2 @@
-100,399,19,true
-discord,steam,instagram,valorant,minecraft,gemini,spotify,notepad
+50,0,0,true
+discord,steam,instagram,valorant,minecraft,spotify,notepad
