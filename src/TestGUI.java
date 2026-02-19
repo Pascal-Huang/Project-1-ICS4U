@@ -1,39 +1,34 @@
 import javax.swing.*;
-import javax.swing.border.Border;
-
 import java.awt.*;
-import java.awt.event.ActionListener;
 
 public class TestGUI extends JFrame {
-    // Logic Objects
+    // Main Objects
     private Pet pet;
     private AppMonitor monitor;
     private DataManager dataManager;
 
-    // Components
+    // GUI Components
     private JLabel petImageLabel, leveLabel, statusLabel;
     private JProgressBar healthBar;
     private JProgressBar xpBar;
     private JToggleButton deepWorkToggle;
     private JButton pauseButton, settingsButton, profileButton1, profileButton2;
 
-    // State Variables
+    // State Variable
     private boolean isPlaying = false;
-    private boolean focused = true;
-    private boolean deepWorkMode = false;
 
-    // Titlescreen
+    // Main screen panel
     private CardLayout cardLayout = new CardLayout();
     private JPanel mainContainer = new JPanel(cardLayout);
 
     // Colors
-    private final Color BG_COLOR = new Color(90, 122, 232); // The nice Blue
+    private final Color BG_COLOR = new Color(90, 122, 232); // Custom blue background
     private final Color TEXT_COLOR = Color.WHITE;
 
     //Animation arrays
     private ImageIcon[] idleAnimation;
     private ImageIcon[] pauseButtonToggle;
-    private ImageIcon[] deepWorkAnimation;
+    private ImageIcon[] deepWorkAnimation; //Future feature
     int frameIndex = 0;
 
     public TestGUI(Pet p, AppMonitor m, DataManager d) {
@@ -57,13 +52,13 @@ public class TestGUI extends JFrame {
         cardLayout.show(mainContainer, "TITLE");
         setVisible(true);
     }
-
+    // Creates the title screen panel with profile selection and instructions button
     private JPanel createTitlePanel() {
         JPanel panel = new JPanel(new GridBagLayout());
         panel.setBackground(BG_COLOR);
-        GridBagConstraints c = new GridBagConstraints();
+        GridBagConstraints c = new GridBagConstraints(); //Used to manipulate positioning of components in the grid layout through constraints
 
-        // 1. Title Text
+        // Title Text
         JLabel title = new JLabel("Welcome to StuddyBuddy");
         title.setFont(new Font("SansSerif", Font.BOLD, 32));
         title.setForeground(Color.WHITE);
@@ -73,7 +68,7 @@ public class TestGUI extends JFrame {
         c.insets = new Insets(0, 0, 80, 0); // Gap below title
         panel.add(title, c);
 
-        // 2. Profile Buttons Container
+        // Profile Buttons Container
         JPanel buttonPanel = new JPanel(new GridLayout(1, 2, 40, 0)); // 1 row, 2 cols, 40px gap
         buttonPanel.setOpaque(false);
 
@@ -84,6 +79,7 @@ public class TestGUI extends JFrame {
         profileButton1.setBorder(BorderFactory.createLineBorder(Color.WHITE, 4));
         profileButton1.setContentAreaFilled(false);
 
+        // Hover effect for profile buttons
         profileButton1.addMouseListener(new java.awt.event.MouseAdapter() {
             @Override
             public void mouseEntered(java.awt.event.MouseEvent evt) {
@@ -128,7 +124,7 @@ public class TestGUI extends JFrame {
         c.insets = new Insets(0, 0, 60, 0); // Gap below buttons
         panel.add(buttonPanel, c);
 
-        // 3. Instructions Button (Purple Pill)
+        // Instructions Button
         JButton instructBtn = createButton("/assets/settings btn.png", "Instructions", 50, 50);
         instructBtn.addActionListener(e -> {
             JOptionPane.showMessageDialog(this, 
@@ -147,29 +143,29 @@ public class TestGUI extends JFrame {
         return panel;
     }
 
-    private void initializeGame(int filePath) {
+    private void initializeGame(int filePath) { // Load data and initialize game screen
         dataManager.setFilePath(filePath);
         dataManager.loadData();
-        if (pet.isAlive() == false){
+        if (pet.isAlive() == false){ // If pet is dead, reset data to initial values
             dataManager.loadDefaultData();
             System.out.println("Loaded default data");
         }
+        // Create Game Panel
         JPanel gamePanel = createGamePanel();
-        
-        //Add and Show
         mainContainer.add(gamePanel, "GAME");
         cardLayout.show(mainContainer, "GAME");
 
         // Start Loops
+        monitor.closeBlackList(monitor.getBlackList()); // Close any blacklisted apps that are currently open when game starts
         isPlaying = true;
         loadAnimations();
         startAnimation(idleAnimation, petImageLabel);
         startGame(); 
     }
-    private JPanel createGamePanel() {
+    private JPanel createGamePanel() { // Creates the main game GUI with all necessary pet stats info
         JPanel gamePanel = new JPanel(new GridBagLayout());
         gamePanel.setBackground(BG_COLOR);
-        GridBagConstraints c = new GridBagConstraints();
+        GridBagConstraints c = new GridBagConstraints(); //Using constraints to manipulate positioning of components
 
         // --- TOP HEADER (LEFT) ---
         JPanel leftPanel = new JPanel(new GridLayout(2, 1, 0, 5));
@@ -178,7 +174,7 @@ public class TestGUI extends JFrame {
         pauseButton.setFont(new Font("SansSerif", Font.BOLD, 20));
         leftPanel.add(pauseButton);
 
-        deepWorkToggle = new JToggleButton("Deep Work: OFF");
+        deepWorkToggle = new JToggleButton("Deep Work: OFF"); //Deep work button
         deepWorkToggle.setFocusPainted(false);
         deepWorkToggle.setBackground(Color.WHITE);
         deepWorkToggle.setForeground(BG_COLOR);
@@ -186,6 +182,7 @@ public class TestGUI extends JFrame {
         deepWorkToggle.setFont(new Font("SansSerif", Font.BOLD, 12));
         leftPanel.add(deepWorkToggle);
 
+        //Control the positioning and spacing of the left panel in the grid
         c.gridx = 0; c.gridy = 0;
         c.weightx = 0.2; c.weighty = 0.0;
         c.anchor = GridBagConstraints.NORTHWEST;
@@ -195,7 +192,7 @@ public class TestGUI extends JFrame {
         // --- TOP HEADER (CENTER - HEALTH & LEVEL) ---
         JPanel centerTopPanel = new JPanel(new GridBagLayout());
         centerTopPanel.setOpaque(false);
-        GridBagConstraints topC = new GridBagConstraints();
+        GridBagConstraints topC = new GridBagConstraints(); //Specefic constraints on the top center panel
 
         // Health Bar
         healthBar = new JProgressBar(0, 100);
@@ -207,14 +204,14 @@ public class TestGUI extends JFrame {
         healthBar.setStringPainted(true);
 
         healthBar.setUI(new javax.swing.plaf.basic.BasicProgressBarUI() {
-        protected Color getSelectionBackground() {
+        protected Color getSelectionBackground() { // Allows for text colour to be changed
             return Color.WHITE; // Text color when over the empty (dark red) part
         }
         protected Color getSelectionForeground() {
             return Color.WHITE; // Text color when over the filled (bright red) part
         }
         });
-        
+        //Healthbar placement on top center panel
         topC.gridx = 0; topC.gridy = 0;
         topC.fill = GridBagConstraints.HORIZONTAL; 
         topC.weightx = 1.0;
@@ -225,6 +222,7 @@ public class TestGUI extends JFrame {
         leveLabel.setFont(new Font("SansSerif", Font.BOLD, 20));
         leveLabel.setForeground(TEXT_COLOR);
 
+        //Level label placement on top center panel
         topC.gridy = 1;
         topC.fill = GridBagConstraints.HORIZONTAL;
         topC.weightx = 1.0;
@@ -239,6 +237,7 @@ public class TestGUI extends JFrame {
         gamePanel.add(centerTopPanel, c);
 
         // --- TOP HEADER (RIGHT) ---
+        //Settings Button
         settingsButton = createButton("/assets/settings btn.png", "Settings", 50, 50);
         settingsButton.setFont(new Font("SansSerif", Font.BOLD, 25));
 
@@ -250,6 +249,7 @@ public class TestGUI extends JFrame {
         gamePanel.add(settingsButton, c);
 
         // --- CENTER PET ---
+        //Create pet image label and set initial icon
         petImageLabel = new JLabel();
         petImageLabel.setHorizontalAlignment(SwingConstants.CENTER);
         
@@ -262,6 +262,7 @@ public class TestGUI extends JFrame {
         gamePanel.add(petImageLabel, c);
 
         // --- BOTTOM STATS (XP) ---
+        //xp bar setup
         xpBar = new JProgressBar(0, (int) pet.getRequiredXp(pet.getLevel()+1 ));
         xpBar.setString("XP: " + pet.getXp() + "/" + pet.getRequiredXp(pet.getLevel() + 1));
         xpBar.setValue((int)pet.getXp());
@@ -281,6 +282,7 @@ public class TestGUI extends JFrame {
         gamePanel.add(xpBar, c);
 
         // --- STATUS LABEL ---
+        // Label to show current status (focused, distracted, paused, etc)
         statusLabel = new JLabel("Status: Scanning...", SwingConstants.CENTER);
         statusLabel.setOpaque(true); 
         statusLabel.setBackground(Color.WHITE); 
@@ -298,7 +300,7 @@ public class TestGUI extends JFrame {
 
         return gamePanel;
     }
-    //Icon loader to insert images
+    //Icon loader to insert images onto different components
     private ImageIcon loadIcon(String fileName, int width, int height) {
         try{
             // Get image URL from resources
@@ -318,7 +320,7 @@ public class TestGUI extends JFrame {
             return null;
         }
     }
-    private void loadAnimations(){
+    private void loadAnimations(){ // Loads all the frames of the idle animation into an array
         idleAnimation = new ImageIcon[10];
         pauseButtonToggle = new ImageIcon[2];
         for (int i = 0; i < idleAnimation.length; i++){
@@ -327,7 +329,7 @@ public class TestGUI extends JFrame {
         pauseButtonToggle[0] = loadIcon("/assets/pause btn.png.png", 70, 70);
         pauseButtonToggle[1] = loadIcon("/assets/play btn.png.png", 70, 70);
     }
-    private void startAnimation(ImageIcon[] animation, JLabel label){
+    private void startAnimation(ImageIcon[] animation, JLabel label){ //Starts the loop for animations
         
         Timer animationTimer = new Timer(170, e -> {
             if (!isPlaying) return; // Pause animation when game is paused
@@ -339,6 +341,7 @@ public class TestGUI extends JFrame {
         });
         animationTimer.start();
     }
+    //Creates button and puts icon images on top
     private JButton createButton(String fileName, String buttonText, int width, int height) {
         JButton btn = new JButton();
         ImageIcon icon = loadIcon(fileName, width, height); // Size adjustment for buttpns
@@ -360,8 +363,8 @@ public class TestGUI extends JFrame {
     private void setupListeners() {
         pauseButton.addActionListener(e -> {
             isPlaying = !isPlaying;
-            statusLabel.setText(isPlaying ? "Status: Scanning..." : "Game Paused");
-            if (isPlaying) {
+            statusLabel.setText(isPlaying ? "Status: Scanning..." : "Game Paused"); //Swithces between scanning and paused 
+            if (isPlaying) { //Toggle pause/play icons
                 pauseButton.setIcon(pauseButtonToggle[0]); // Show pause icon when playing
             } else {
                 pauseButton.setIcon(pauseButtonToggle[1]); // Show play icon when paused
@@ -370,14 +373,12 @@ public class TestGUI extends JFrame {
 
         deepWorkToggle.addActionListener(e -> {
             boolean mode = deepWorkToggle.isSelected();
-            monitor.setDeepWork(mode);
-            // Assuming AppMonitor has a setter
-            // monitor.setDeepWork(mode); 
+            monitor.setDeepWork(mode); //Set deep work mode in monitor
             deepWorkToggle.setText(monitor.getDeepWork() ? "Deep Work: ON" : "Deep Work: OFF");
             deepWorkToggle.setBackground(mode ? Color.RED : Color.WHITE);
             deepWorkToggle.setForeground(mode ? Color.WHITE : BG_COLOR);
         });
-        
+        //Creates setting screen where you can add or remove apps from blacklist
         settingsButton.addActionListener(e -> {
             SettingsGUI settingsScreen = new SettingsGUI(monitor, dataManager);
             settingsScreen.addWindowListener(new java.awt.event.WindowAdapter(){
@@ -393,12 +394,11 @@ public class TestGUI extends JFrame {
         });
     }
 
-    public void startGame() {
+    public void startGame() { //Main game loop that scans (about 30s), applies rewards / punishements and updates the GUI
         System.out.println(pet.toString());
         Thread gameLoop = new Thread(() -> {
             while(true){
                 if (isPlaying){
-                    // SwingUtilities.invokeLater(() -> statusLabel.setText("Status: Scanning...")); // Update Status to "Scanning"
                     if (!pet.isAlive()){
                         petDied();
                     }
@@ -447,13 +447,14 @@ public class TestGUI extends JFrame {
         isPlaying = !isPlaying;
         if (isPlaying) {
             pauseButton.setIcon(pauseButtonToggle[0]); // Show pause icon when playing
-            statusLabel.setText("Game Resumed test");
+            statusLabel.setText("Game Resumed");
         } 
         else {
             pauseButton.setIcon(pauseButtonToggle[1]); // Show play icon when paused
             statusLabel.setText("Game Paused");
         }
     }
+    //Opens JOptionPane when pet dies and closes program when they click ok
     public void petDied(){
         isPlaying = false; 
         

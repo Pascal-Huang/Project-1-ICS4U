@@ -1,12 +1,14 @@
 import java.io.*;
-import java.util.ArrayList;
 import java.util.Arrays;
 
 public class DataManager {
+    // Textfiles for data storage
     private final String profile1 = "profile1.txt";
     private final String profile2 = "profile2.txt";
     private String filePath;
     private int profileNumber;
+
+    // References to main objects
     private Pet pet;
     private AppMonitor monitor;
 
@@ -15,6 +17,8 @@ public class DataManager {
         this.monitor = monitor;
 
     }
+
+    // Saves pet and blacklist data to a text file (line 1 = pet data, line 2 = blacklisted apps)
     public void saveData(){
         try {
             PrintWriter writer = new PrintWriter(new FileWriter(filePath));
@@ -26,7 +30,8 @@ public class DataManager {
         catch(IOException e){
             System.out.println("Error saving data " + e.getMessage());
         }
-    }   
+    } 
+    // Takes data from text files and updates pet and blacklist data objects
     public void loadData(){
         try{
             BufferedReader reader = new BufferedReader(new FileReader(filePath));
@@ -52,6 +57,7 @@ public class DataManager {
             System.out.println("Error loading data " + e.getMessage());
         }
     }
+    // Sets pet data to default values for when pet dies / user wants to reset
     public void loadDefaultData(){
         pet.setHealth(100);
         pet.setXp(0);

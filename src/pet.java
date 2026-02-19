@@ -1,4 +1,5 @@
 public class Pet {
+    //instance variables
     private String name;
     private int health;
     private long xp;
@@ -8,7 +9,7 @@ public class Pet {
     private long requirementIncrease = 0;
 
     public Pet(int h, int x, int lvl, boolean isA){
-        this.name = "Pet";
+        this.name = "Pet"; //Feature not included yet   
         this.health = h;
         this.xp = x;
         this.level = lvl;
@@ -21,7 +22,7 @@ public class Pet {
     public long getXp() {
         return xp;
     }
-    public long getRequiredXp(int lvl) {
+    public long getRequiredXp(int lvl) { //Math to calculate required xp for a given level (increases)
         long base = 100;
         xpIncrease = 50;
 
@@ -42,6 +43,7 @@ public class Pet {
             System.out.println("Your pet has died :(");
         }
     }
+    //Handles changes in xp, including level up and down and health decrease on xp loss
     public void changeXp(int change){
         this.xp += change;
         long requiredXp = getRequiredXp(this.level + 1);

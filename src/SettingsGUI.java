@@ -9,7 +9,7 @@ public class SettingsGUI extends JFrame {
     private DataManager dataManager;
     private AppMonitor monitor;
 
-    // UI Components
+    // GUI Components
     private JPanel listPanel; // The container inside the scroll pane
     private JTextField inputField;
     
@@ -24,7 +24,7 @@ public class SettingsGUI extends JFrame {
         // Link directly to the single list in AppMonitor
         this.blackList = monitor.getBlackList();
 
-        // 1. Window Setup
+        // Window Setup
         setTitle("Distraction Settings");
         setSize(400, 600);
         setLayout(new BorderLayout());
@@ -32,7 +32,7 @@ public class SettingsGUI extends JFrame {
         setLocationRelativeTo(null); // Center on screen
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
-        // 2. Header Panel (Title Only)
+        // Header Panel (Title Only)
         JPanel headerPanel = new JPanel();
         headerPanel.setBackground(BG_COLOR);
         headerPanel.setBorder(new EmptyBorder(20, 0, 10, 0));
@@ -45,7 +45,7 @@ public class SettingsGUI extends JFrame {
         add(headerPanel, BorderLayout.NORTH);
 
 
-        // 3. The List Area (Middle)
+        // The List Area (Middle)
         listPanel = new JPanel();
         listPanel.setLayout(new BoxLayout(listPanel, BoxLayout.Y_AXIS)); 
         listPanel.setBackground(BG_COLOR);
@@ -68,7 +68,7 @@ public class SettingsGUI extends JFrame {
         add(scrollContainer, BorderLayout.CENTER);
 
 
-        // 4. Input Area (Bottom)
+        // Input Area (Bottom)
         JPanel bottomPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
         bottomPanel.setBackground(BG_COLOR);
         bottomPanel.setBorder(new EmptyBorder(15, 0, 20, 0));
@@ -136,7 +136,7 @@ public class SettingsGUI extends JFrame {
         refreshList();              // Update UI
     }
 
-    // --- UI HELPER METHODS ---
+    // --- GUI HELPER METHODS ---
 
     private JPanel createListItem(String text) {
         JPanel panel = new JPanel(new BorderLayout());
@@ -166,7 +166,7 @@ public class SettingsGUI extends JFrame {
         return panel;
     }
     
-    // Tiny helper class for Placeholder Text (Inner Class)
+    // Tiny helper class for Placeholder Text in JTextField
     class TextPrompt extends JLabel {
         private final JTextField component;
         public TextPrompt(String text, JTextField component) {
@@ -178,7 +178,7 @@ public class SettingsGUI extends JFrame {
             component.setLayout(new BorderLayout());
             component.add(this);
             
-            // Hide when typing
+            // Hides the inner text when typing
             component.addKeyListener(new java.awt.event.KeyAdapter() {
                 public void keyReleased(java.awt.event.KeyEvent e) {
                     setVisible(component.getText().isEmpty());

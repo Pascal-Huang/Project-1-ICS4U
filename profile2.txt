@@ -1,2 +1,2 @@
-100,2000,45,true
-valorant,minecraft,spotify,discord,youtube
+100,0,5,true
+valorant,minecraft,spotify,discord,youtube,onenote

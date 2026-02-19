@@ -5,12 +5,13 @@ import java.util.List;
 
 
 public class AppMonitor {
+    // Instance variables
    private ArrayList<String> blackList;
    private boolean deepWorkMode;
-   ArrayList<String> ignoreTitles = new ArrayList<>();
+   ArrayList<String> ignoreTitles = new ArrayList<>(); //List of keywords to ignore background processes
 
 
-    public AppMonitor(ArrayList<String> list,boolean deepWork){
+    public AppMonitor(ArrayList<String> list, boolean deepWork){
         this.blackList = list;
         this.deepWorkMode = deepWork;
 
@@ -22,21 +23,19 @@ public class AppMonitor {
     }
 
     /*Method that uses the command prompt to get a list of the running applications, ensures it is not a background process ,
-    and then comapres it to the black listed apps */ 
+    and then compares it to the black listed apps untill a detection is made or none at all*/ 
     public boolean isFocused(List<String> blackList){
         String line;
         try{
-            Process p = Runtime.getRuntime().exec("tasklist /v /fo csv /nh");
-            BufferedReader input = new BufferedReader(new InputStreamReader(p.getInputStream()));
-
-
+            Process p = Runtime.getRuntime().exec("tasklist /v /fo csv /nh"); //Command to get lid of all running apps
+            BufferedReader input = new BufferedReader(new InputStreamReader(p.getInputStream())); // Reads the output of command
             while ((line = input.readLine()) != null) {
                 String lowerLine = line.toLowerCase();
                 for (int i = 0; i < blackList.size(); i++){
-                    if ((lowerLine.contains(blackList.get(i)) && isRealWindow(lowerLine))){
+                    if ((lowerLine.contains(blackList.get(i)) && isRealWindow(lowerLine))){ //Compare to blacklist
                         System.out.println("Detected " + lowerLine);
                         if (deepWorkMode){
-                            closeApp(lowerLine);
+                            closeApp(blackList.get(i)); // Closes app if in deep work mode
                         }
                         return false;
                     }
@@ -49,7 +48,7 @@ public class AppMonitor {
         }
         return true;
     }
-    public boolean isRealWindow(String app){
+    public boolean isRealWindow(String app){ // Checks if it is not just a background process (prevents false detections)
         for (int i = 0; i < ignoreTitles.size(); i++){
             if (app.contains(ignoreTitles.get(i))){
                 return false;
@@ -74,8 +73,8 @@ public class AppMonitor {
     public void setDeepWork(boolean mode){
         this.deepWorkMode = mode;
     }
-    public void closeApp(String CSVLine){
-        String appName = getFileName(CSVLine);
+    public void closeApp(String CSVLine){ // Closes selected app using command prompt
+        String appName = CSVLine;
         try{
             Runtime.getRuntime().exec("taskkill /F /IM " + appName + ".exe");
             System.out.println("Closed " + appName);
