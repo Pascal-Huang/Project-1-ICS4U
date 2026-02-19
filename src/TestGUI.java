@@ -11,7 +11,7 @@ public class TestGUI extends JFrame {
     private DataManager dataManager;
 
     // Components
-    private JLabel petImageLabel, nameLabel, statusLabel;
+    private JLabel petImageLabel, leveLabel, statusLabel;
     private JProgressBar healthBar;
     private JProgressBar xpBar;
     private JToggleButton deepWorkToggle;
@@ -135,7 +135,8 @@ public class TestGUI extends JFrame {
                 "1. Select a profile to start.\n" +
                 "2. Press settings button to add/remove programs that will distract you while studying.\n" +
                 "3. The app runs in the background while you study.\n" +
-                "3. Avoid blocked apps to keep your pet happy while leveling up!",
+                "4. You can turn on deep work mode, which auto shuts down any distracting apps.\n" +  
+                "5. Avoid blocked apps to keep your pet happy while leveling up!",
                 "How to Play", JOptionPane.INFORMATION_MESSAGE);
         });
 
@@ -149,6 +150,10 @@ public class TestGUI extends JFrame {
     private void initializeGame(int filePath) {
         dataManager.setFilePath(filePath);
         dataManager.loadData();
+        if (pet.isAlive() == false){
+            dataManager.loadDefaultData();
+            System.out.println("Loaded default data");
+        }
         JPanel gamePanel = createGamePanel();
         
         //Add and Show
@@ -187,7 +192,7 @@ public class TestGUI extends JFrame {
         c.insets = new Insets(10, 10, 0, 0);
         gamePanel.add(leftPanel, c);
 
-        // --- TOP HEADER (CENTER - HEALTH & NAME) ---
+        // --- TOP HEADER (CENTER - HEALTH & LEVEL) ---
         JPanel centerTopPanel = new JPanel(new GridBagLayout());
         centerTopPanel.setOpaque(false);
         GridBagConstraints topC = new GridBagConstraints();
@@ -216,14 +221,14 @@ public class TestGUI extends JFrame {
         topC.insets = new Insets(0, 0, 5, 0); //Adjust healthbar positioning
         centerTopPanel.add(healthBar, topC);
 
-        nameLabel = new JLabel(pet.getName(), SwingConstants.CENTER);
-        nameLabel.setFont(new Font("SansSerif", Font.BOLD, 20));
-        nameLabel.setForeground(TEXT_COLOR);
+        leveLabel = new JLabel("Level: " + pet.getLevel(), SwingConstants.CENTER);
+        leveLabel.setFont(new Font("SansSerif", Font.BOLD, 20));
+        leveLabel.setForeground(TEXT_COLOR);
 
         topC.gridy = 1;
         topC.fill = GridBagConstraints.HORIZONTAL;
         topC.weightx = 1.0;
-        centerTopPanel.add(nameLabel, topC);
+        centerTopPanel.add(leveLabel, topC);
 
         // Add Center Top Panel to Main Grid
         c.gridx = 1; c.gridy = 0;
@@ -276,7 +281,7 @@ public class TestGUI extends JFrame {
         gamePanel.add(xpBar, c);
 
         // --- STATUS LABEL ---
-        statusLabel = new JLabel("Status: Active", SwingConstants.CENTER);
+        statusLabel = new JLabel("Status: Scanning...", SwingConstants.CENTER);
         statusLabel.setOpaque(true); 
         statusLabel.setBackground(Color.WHITE); 
         statusLabel.setForeground(BG_COLOR);
@@ -351,14 +356,6 @@ public class TestGUI extends JFrame {
         return btn;
     }
 
-    private void styleButton(AbstractButton btn) {
-        btn.setFocusPainted(false);
-        btn.setBackground(Color.WHITE);
-        btn.setForeground(BG_COLOR);
-        btn.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10)); // Padding
-        btn.setFont(new Font("SansSerif", Font.BOLD, 12));
-    }
-    
     //Logic & Listeners
     private void setupListeners() {
         pauseButton.addActionListener(e -> {
@@ -401,30 +398,38 @@ public class TestGUI extends JFrame {
         Thread gameLoop = new Thread(() -> {
             while(true){
                 if (isPlaying){
-                    SwingUtilities.invokeLater(() -> statusLabel.setText("Status: Scanning...")); // Update Status to "Scanning"
-
+                    // SwingUtilities.invokeLater(() -> statusLabel.setText("Status: Scanning...")); // Update Status to "Scanning"
+                    if (!pet.isAlive()){
+                        petDied();
+                    }
                     boolean isFocused = monitor.isFocused(monitor.getBlackList()); 
                     if (isFocused) {
                         pet.changeXp(1000);
-                        statusLabel.setText("Focused: + 1000 XP!");
                     } else {
                         pet.changeHealth(-5);
                         pet.changeXp(-200);
-                        statusLabel.setText("Distracted!!!!");
 
                     }
                     dataManager.saveData();
                     System.out.println(pet.toString());
+                    
 
                     // Update UI on main thread
                     SwingUtilities.invokeLater(() -> {
                         healthBar.setValue(pet.getHealth());
+                        healthBar.setString(pet.getHealth() + "/100 health");
                         xpBar.setValue((int)pet.getXp());
                         xpBar.setMaximum((int)pet.getRequiredXp(pet.getLevel() + 1));
                         xpBar.setString("XP: " + pet.getXp() + "/" + pet.getRequiredXp(pet.getLevel() + 1));
+                        leveLabel.setText("Level: " + pet.getLevel());
                         
-                        // if (isFocused) statusLabel.setText("Status: Focused");
-                        // else statusLabel.setText("Status: Distracted!");
+                        if (isFocused) {
+                            statusLabel.setText("Focused: +1000 XP!");
+                            statusLabel.setForeground(new Color(0, 150, 0)); // Dark Green
+                        } else {
+                            statusLabel.setText("Distracted!!!");
+                            statusLabel.setForeground(Color.RED); // Bright Red
+                        }
                     });
                 }
                 else{
@@ -448,5 +453,19 @@ public class TestGUI extends JFrame {
             pauseButton.setIcon(pauseButtonToggle[1]); // Show play icon when paused
             statusLabel.setText("Game Paused");
         }
+    }
+    public void petDied(){
+        isPlaying = false; 
+        
+        SwingUtilities.invokeLater(() -> {
+            JOptionPane.showMessageDialog(this, 
+                "Your pet has died due to too many distractions.\n\nGame Over.", 
+                "You Died", 
+                JOptionPane.ERROR_MESSAGE);
+            
+            // Close the program when they click OK
+            System.exit(0);
+        });
+        
     }
 }

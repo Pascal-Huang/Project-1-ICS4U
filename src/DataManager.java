@@ -15,7 +15,6 @@ public class DataManager {
         this.monitor = monitor;
 
     }
-    
     public void saveData(){
         try {
             PrintWriter writer = new PrintWriter(new FileWriter(filePath));
@@ -52,6 +51,13 @@ public class DataManager {
         catch(IOException e){
             System.out.println("Error loading data " + e.getMessage());
         }
+    }
+    public void loadDefaultData(){
+        pet.setHealth(100);
+        pet.setXp(0);
+        pet.setLevel(0);
+        pet.setAlive(true);
+        saveData();
     }
     public void setFilePath(int profile){
         if (profile == 1){

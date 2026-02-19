@@ -100,7 +100,6 @@ public class SettingsGUI extends JFrame {
         bottomPanel.add(addBtn);
         add(bottomPanel, BorderLayout.SOUTH);
 
-        // Initial Load
         refreshList();
         setVisible(true);
     }
