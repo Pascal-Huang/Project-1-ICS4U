@@ -1,2 +1,2 @@
-5,0,0,true
-discord,spotify,youtube,steam,notepad,onenote,test
+100,49,12,true
+minecraft,youtube

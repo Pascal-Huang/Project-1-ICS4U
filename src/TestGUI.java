@@ -403,15 +403,17 @@ public class TestGUI extends JFrame {
                         petDied();
                     }
                     boolean isFocused = monitor.isFocused(monitor.getBlackList()); 
-                    if (isFocused) {
-                        pet.changeXp(1000);
-                    } else {
-                        pet.changeHealth(-5);
-                        pet.changeXp(-200);
+                    if (isPlaying){
+                            if (isFocused) {
+                            pet.changeXp(1000);
+                        } else {
+                            pet.changeHealth(-5);
+                            pet.changeXp(-200);
 
+                        }
+                        dataManager.saveData();
+                        System.out.println(pet.toString());
                     }
-                    dataManager.saveData();
-                    System.out.println(pet.toString());
                     
 
                     // Update UI on main thread
